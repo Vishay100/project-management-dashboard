@@ -167,6 +167,58 @@
                 console.error(`Error adding ${action}:`, error);
             }
         }
+         async function fetchWithCORS(url, options = {}) {
+        const defaultOptions = {
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        };
+        const mergedOptions = { ...defaultOptions, ...options };
+        
+        try {
+            const response = await fetch(url, mergedOptions);
+            if (!response.ok) throw new Error('Network response was not ok');
+            return await response.json();
+        } catch (error) {
+            console.error('Fetch error:', error);
+            throw error;
+        }
+    }
+    
+    async function fetchTasks() {
+        try {
+            const { tasks, sections } = await fetchWithCORS(SCRIPT_URL);
+            renderTaskList(tasks, sections);
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
+        }
+    }
+    
+    async function updateTaskStatus(taskId, status) {
+        try {
+            await fetchWithCORS(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'updateTaskStatus', taskId, status }),
+            });
+            fetchTasks();
+        } catch (error) {
+            console.error('Error updating task status:', error);
+        }
+    }
+    
+    async function addItem(action, data) {
+        try {
+            await fetchWithCORS(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action, ...data }),
+            });
+            document.querySelector('.modal').classList.add('hidden');
+            fetchTasks();
+        } catch (error) {
+            console.error(`Error adding ${action}:`, error);
+        }
+    }   
 
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('add-task-btn')) {
