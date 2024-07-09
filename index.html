@@ -150,46 +150,46 @@
         }
 
        document.getElementById('addTaskForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const parentTask = document.getElementById('parentTask').value;
-    const section = document.getElementById('section').value;
-    const assignee = document.getElementById('assignee').value;
-    const startDate = document.getElementById('startDate').value;
-    const dueDate = document.getElementById('dueDate').value;
-    const status = document.getElementById('status').value;
-
-    await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action: 'addTask', parentTask, section, assignee, startDate, dueDate, status }),
-    });
-
-    document.getElementById('addTaskModal').classList.add('hidden');
-    fetchTasks();
-});
-
-document.getElementById('addSubtaskForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const parentTask = document.getElementById('parentTaskSelect').value;
-    const subtask = document.getElementById('subtaskName').value;
-    const assignee = document.getElementById('subtaskAssignee').value;
-    const startDate = document.getElementById('subtaskStartDate').value;
-    const dueDate = document.getElementById('subtaskDueDate').value;
-    const status = document.getElementById('subtaskStatus').value;
-
-    await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action: 'addSubtask', parentTask, subtask, assignee, startDate, dueDate, status }),
-    });
-
-    document.getElementById('addSubtaskModal').classList.add('hidden');
-    fetchTasks();
-});
+            e.preventDefault();
+            const parentTask = document.getElementById('parentTask').value;
+            const section = document.getElementById('section').value;
+            const assignee = document.getElementById('assignee').value;
+            const startDate = document.getElementById('startDate').value;
+            const dueDate = document.getElementById('dueDate').value;
+            const status = document.getElementById('status').value;
+        
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'addTask', parentTask, section, assignee, startDate, dueDate, status }),
+            });
+        
+            document.getElementById('addTaskModal').classList.add('hidden');
+            fetchTasks();
+        });
+        
+        document.getElementById('addSubtaskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const parentTask = document.getElementById('parentTaskSelect').value;
+            const subtask = document.getElementById('subtaskName').value;
+            const assignee = document.getElementById('subtaskAssignee').value;
+            const startDate = document.getElementById('subtaskStartDate').value;
+            const dueDate = document.getElementById('subtaskDueDate').value;
+            const status = document.getElementById('subtaskStatus').value;
+        
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'addSubtask', parentTask, subtask, assignee, startDate, dueDate, status }),
+            });
+        
+            document.getElementById('addSubtaskModal').classList.add('hidden');
+            fetchTasks();
+        });
 
 
         document.getElementById('addSectionBtn').addEventListener('click', () => {
