@@ -10,7 +10,78 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
-    <!-- ... (rest of the HTML remains the same) ... -->
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">2024 Road Map</h1>
+        <div class="mb-4 flex space-x-2">
+            <button class="px-4 py-2 bg-blue-500 text-white rounded">Overview</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">List</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Board</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Timeline</button>
+        </div>
+        <div class="mb-4 flex justify-between items-center">
+            <button id="addSectionBtn" class="px-4 py-2 bg-green-500 text-white rounded">+ Add Section</button>
+        </div>
+        <div id="taskList" class="bg-white rounded shadow"></div>
+    </div>
+    <!-- Modal for adding task -->
+    <div id="addTaskModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
+        <div class="bg-white p-4 rounded shadow-lg w-1/2">
+            <h2 class="text-xl font-bold mb-4">Add New Task</h2>
+            <form id="addTaskForm">
+                <input type="text" id="parentTask" placeholder="Parent Task" required class="w-full p-2 mb-2 border rounded">
+                <input type="text" id="section" placeholder="Section" required class="w-full p-2 mb-2 border rounded" readonly>
+                <input type="text" id="assignee" placeholder="Assignee" required class="w-full p-2 mb-2 border rounded">
+                <input type="date" id="startDate" required class="w-full p-2 mb-2 border rounded">
+                <input type="date" id="dueDate" required class="w-full p-2 mb-2 border rounded">
+                <select id="status" required class="w-full p-2 mb-2 border rounded">
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for adding subtask -->
+    <div id="addSubtaskModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
+        <div class="bg-white p-4 rounded shadow-lg w-1/2">
+            <h2 class="text-xl font-bold mb-4">Add New Subtask</h2>
+            <form id="addSubtaskForm">
+                <select id="parentTaskSelect" required class="w-full p-2 mb-2 border rounded"></select>
+                <input type="text" id="subtaskName" placeholder="Subtask Name" required class="w-full p-2 mb-2 border rounded">
+                <input type="text" id="subtaskSection" placeholder="Section" required class="w-full p-2 mb-2 border rounded" readonly>
+                <input type="text" id="subtaskAssignee" placeholder="Assignee" required class="w-full p-2 mb-2 border rounded">
+                <input type="date" id="subtaskStartDate" required class="w-full p-2 mb-2 border rounded">
+                <input type="date" id="subtaskDueDate" required class="w-full p-2 mb-2 border rounded">
+                <select id="subtaskStatus" required class="w-full p-2 mb-2 border rounded">
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelSubtaskBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Subtask</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Modal for adding section -->
+    <div id="addSectionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
+        <div class="bg-white p-4 rounded shadow-lg w-1/2">
+            <h2 class="text-xl font-bold mb-4">Add New Section</h2>
+            <form id="addSectionForm">
+                <input type="text" id="sectionName" placeholder="Section Name" required class="w-full p-2 mb-2 border rounded">
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelSectionBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Section</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcIDy10G-TpRGTeB8TtlcZozuaxs1uScRcYcHyJM-Lf6eKeEDBAvexFfPdzQLZjh648Q/exec'; // Replace with your Web app URL
@@ -75,6 +146,7 @@
                 document.querySelectorAll('.add-subtask-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const section = e.target.getAttribute('data-section');
+                        document.getElementById('subtaskSection').value = section;
                         const parentTasks = tasks.filter(task => task.section === section && task.type === "Task").map(task => `<option value="${task.id}">${task.parentTask}</option>`).join('');
                         document.getElementById('parentTaskSelect').innerHTML = parentTasks;
                         document.getElementById('addSubtaskModal').classList.remove('hidden');
@@ -84,7 +156,8 @@
                 console.error('Error fetching tasks:', error);
             }
         }
-
+    </script>
+    <script>
         async function updateTaskStatus(taskId, status) {
             try {
                 const response = await fetch(SCRIPT_URL, {
@@ -160,52 +233,98 @@
             }
         }
 
-        document.getElementById('addTaskForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const parentTask = document.getElementById('parentTask').value;
-            const section = document.getElementById('section').value;
-            const assignee = document.getElementById('assignee').value;
-            const startDate = document.getElementById('startDate').value;
-            const dueDate = document.getElementById('dueDate').value;
-            const status = document.getElementById('status').value;
-            await addTask(parentTask, section, assignee, startDate, dueDate, status);
-        });
+        // Function to safely add event listener
+        function safeAddEventListener(id, event, handler) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener(event, handler);
+            } else {
+                console.error(`Element with id '${id}' not found`);
+            }
+        }
+    </script>
+    <script>
+        // Setup event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            safeAddEventListener('addTaskForm', 'submit', async (e) => {
+                e.preventDefault();
+                const parentTask = document.getElementById('parentTask')?.value;
+                const section = document.getElementById('section')?.value;
+                const assignee = document.getElementById('assignee')?.value;
+                const startDate = document.getElementById('startDate')?.value;
+                const dueDate = document.getElementById('dueDate')?.value;
+                const status = document.getElementById('status')?.value;
+                if (parentTask && section && assignee && startDate && dueDate && status) {
+                    await addTask(parentTask, section, assignee, startDate, dueDate, status);
+                } else {
+                    console.error('Some form fields are missing');
+                }
+            });
 
-        document.getElementById('addSubtaskForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const parentTask = document.getElementById('parentTaskSelect').value;
-            const subtask = document.getElementById('subtaskName').value;
-            const section = document.getElementById('subtaskSection').value;
-            const assignee = document.getElementById('subtaskAssignee').value;
-            const startDate = document.getElementById('subtaskStartDate').value;
-            const dueDate = document.getElementById('subtaskDueDate').value;
-            const status = document.getElementById('subtaskStatus').value;
-            await addSubtask(parentTask, subtask, section, assignee, startDate, dueDate, status);
-        });
+            safeAddEventListener('addSubtaskForm', 'submit', async (e) => {
+                e.preventDefault();
+                const parentTask = document.getElementById('parentTaskSelect')?.value;
+                const subtask = document.getElementById('subtaskName')?.value;
+                const section = document.getElementById('subtaskSection')?.value;
+                const assignee = document.getElementById('subtaskAssignee')?.value;
+                const startDate = document.getElementById('subtaskStartDate')?.value;
+                const dueDate = document.getElementById('subtaskDueDate')?.value;
+                const status = document.getElementById('subtaskStatus')?.value;
+                if (parentTask && subtask && section && assignee && startDate && dueDate && status) {
+                    await addSubtask(parentTask, subtask, section, assignee, startDate, dueDate, status);
+                } else {
+                    console.error('Some form fields are missing');
+                }
+            });
 
-        document.getElementById('addSectionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const sectionName = document.getElementById('sectionName').value;
-            await addSection(sectionName);
-        });
+            safeAddEventListener('addSectionForm', 'submit', async (e) => {
+                e.preventDefault();
+                const sectionName = document.getElementById('sectionName')?.value;
+                if (sectionName) {
+                    await addSection(sectionName);
+                } else {
+                    console.error('Section name is missing');
+                }
+            });
 
-        document.getElementById('addSectionBtn').addEventListener('click', () => {
-            document.getElementById('addSectionModal').classList.remove('hidden');
-        });
+            safeAddEventListener('addSectionBtn', 'click', () => {
+                const modal = document.getElementById('addSectionModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                } else {
+                    console.error('Add section modal not found');
+                }
+            });
 
-        document.getElementById('cancelBtn').addEventListener('click', () => {
-            document.getElementById('addTaskModal').classList.add('hidden');
-        });
+            safeAddEventListener('cancelBtn', 'click', () => {
+                const modal = document.getElementById('addTaskModal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                } else {
+                    console.error('Add task modal not found');
+                }
+            });
 
-        document.getElementById('cancelSubtaskBtn').addEventListener('click', () => {
-            document.getElementById('addSubtaskModal').classList.add('hidden');
-        });
+            safeAddEventListener('cancelSubtaskBtn', 'click', () => {
+                const modal = document.getElementById('addSubtaskModal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                } else {
+                    console.error('Add subtask modal not found');
+                }
+            });
 
-        document.getElementById('cancelSectionBtn').addEventListener('click', () => {
-            document.getElementById('addSectionModal').classList.add('hidden');
-        });
+            safeAddEventListener('cancelSectionBtn', 'click', () => {
+                const modal = document.getElementById('addSectionModal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                } else {
+                    console.error('Add section modal not found');
+                }
+            });
 
-        fetchTasks(); // Fetch tasks initially on page load
+            fetchTasks(); // Fetch tasks initially on page load
+        });
     </script>
 </body>
 </html>
