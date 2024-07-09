@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2024 Road Map</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- Include Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Include Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
     <div class="container mx-auto p-4">
@@ -22,63 +24,66 @@
         <div id="taskList" class="bg-white rounded shadow"></div>
     </div>
 
-    <!-- Modal for adding task -->
-    <div id="addTaskModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
-        <div class="bg-white p-4 rounded shadow-lg w-1/2">
-            <h2 class="text-xl font-bold mb-4">Add New Task</h2>
-            <form id="addTaskForm">
-                <input type="text" id="parentTask" placeholder="Parent Task" required class="w-full p-2 mb-2 border rounded">
-                <input type="text" id="section" placeholder="Section" required class="w-full p-2 mb-2 border rounded" readonly>
-                <input type="text" id="assignee" placeholder="Assignee" required class="w-full p-2 mb-2 border rounded">
-                <input type="date" id="startDate" required class="w-full p-2 mb-2 border rounded">
-                <input type="date" id="dueDate" required class="w-full p-2 mb-2 border rounded">
-                <select id="status" required class="w-full p-2 mb-2 border rounded">
-                    <option value="Not Started">Not Started</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                </select>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" id="cancelBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Task</button>
-                </div>
-            </form>
+    <!-- Modals for adding task, subtask, and section -->
+    <div id="modals" class="hidden">
+        <!-- Modal for adding task -->
+        <div id="addTaskModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
+            <div class="bg-white p-4 rounded shadow-lg w-1/2">
+                <h2 class="text-xl font-bold mb-4">Add New Task</h2>
+                <form id="addTaskForm">
+                    <input type="text" id="parentTask" placeholder="Parent Task" required class="w-full p-2 mb-2 border rounded">
+                    <input type="text" id="section" placeholder="Section" required class="w-full p-2 mb-2 border rounded" readonly>
+                    <input type="text" id="assignee" placeholder="Assignee" required class="w-full p-2 mb-2 border rounded">
+                    <input type="date" id="startDate" required class="w-full p-2 mb-2 border rounded">
+                    <input type="date" id="dueDate" required class="w-full p-2 mb-2 border rounded">
+                    <select id="status" required class="w-full p-2 mb-2 border rounded">
+                        <option value="Not Started">Not Started</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" id="cancelBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Task</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- Modal for adding subtask -->
-    <div id="addSubtaskModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
-        <div class="bg-white p-4 rounded shadow-lg w-1/2">
-            <h2 class="text-xl font-bold mb-4">Add New Subtask</h2>
-            <form id="addSubtaskForm">
-                <select id="parentTaskSelect" required class="w-full p-2 mb-2 border rounded"></select>
-                <input type="text" id="subtaskName" placeholder="Subtask Name" required class="w-full p-2 mb-2 border rounded">
-                <input type="text" id="subtaskAssignee" placeholder="Assignee" required class="w-full p-2 mb-2 border rounded">
-                <input type="date" id="subtaskStartDate" required class="w-full p-2 mb-2 border rounded">
-                <input type="date" id="subtaskDueDate" required class="w-full p-2 mb-2 border rounded">
-                <select id="subtaskStatus" required class="w-full p-2 mb-2 border rounded">
-                    <option value="Not Started">Not Started</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                </select>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" id="cancelSubtaskBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Subtask</button>
-                </div>
-            </form>
+        <!-- Modal for adding subtask -->
+        <div id="addSubtaskModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
+            <div class="bg-white p-4 rounded shadow-lg w-1/2">
+                <h2 class="text-xl font-bold mb-4">Add New Subtask</h2>
+                <form id="addSubtaskForm">
+                    <select id="parentTaskSelect" required class="w-full p-2 mb-2 border rounded"></select>
+                    <input type="text" id="subtaskName" placeholder="Subtask Name" required class="w-full p-2 mb-2 border rounded">
+                    <input type="text" id="subtaskAssignee" placeholder="Assignee" required class="w-full p-2 mb-2 border rounded">
+                    <input type="date" id="subtaskStartDate" required class="w-full p-2 mb-2 border rounded">
+                    <input type="date" id="subtaskDueDate" required class="w-full p-2 mb-2 border rounded">
+                    <select id="subtaskStatus" required class="w-full p-2 mb-2 border rounded">
+                        <option value="Not Started">Not Started</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" id="cancelSubtaskBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Subtask</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
 
-    <!-- Modal for adding section -->
-    <div id="addSectionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
-        <div class="bg-white p-4 rounded shadow-lg w-1/2">
-            <h2 class="text-xl font-bold mb-4">Add New Section</h2>
-            <form id="addSectionForm">
-                <input type="text" id="sectionName" placeholder="Section Name" required class="w-full p-2 mb-2 border rounded">
-                <div class="flex justify-end space-x-2">
-                    <button type="button" id="cancelSectionBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Section</button>
-                </div>
-            </form>
+        <!-- Modal for adding section -->
+        <div id="addSectionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
+            <div class="bg-white p-4 rounded shadow-lg w-1/2">
+                <h2 class="text-xl font-bold mb-4">Add New Section</h2>
+                <form id="addSectionForm">
+                    <input type="text" id="sectionName" placeholder="Section Name" required class="w-full p-2 mb-2 border rounded">
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" id="cancelSectionBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Section</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -86,70 +91,145 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHldSWrqz1vHt0ZAyJjKdYLMoAXnQ4GB5uh8a10uKPYGf3bWeTe9K_WgCIA6zVTI7brw/exec'; // Replace with your Web app URL
 
         async function fetchTasks() {
-            const response = await fetch(SCRIPT_URL);
-            const { tasks, sections } = await response.json();
-            const taskList = document.getElementById('taskList');
-            taskList.innerHTML = '';
-            let currentSection = '';
-            sections.forEach(section => {
-                taskList.innerHTML += `
-                    <div class="section-header flex items-center p-2 bg-gray-100">
-                        <i class="fas fa-chevron-down mr-2"></i>
-                        <h2 class="text-lg font-bold">${section}</h2>
-                    </div>
-                    <div class="task-buttons mb-2">
-                        <button class="add-task-btn px-4 py-2 bg-blue-500 text-white rounded" data-section="${section}">+ Add Task</button>
-                        <button class="add-subtask-btn px-4 py-2 bg-green-500 text-white rounded" data-section="${section}">+ Add Subtask</button>
-                    </div>
-                `;
-                tasks.filter(task => task.section === section).forEach(task => {
-                    const assigneeInitials = task.assignee.split(' ').map(name => name[0]).join('').toUpperCase();
+            try {
+                const response = await fetch(SCRIPT_URL);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const { tasks, sections } = await response.json();
+                const taskList = document.getElementById('taskList');
+                taskList.innerHTML = '';
+                sections.forEach(section => {
                     taskList.innerHTML += `
-                        <div class="task-item flex items-center p-2 border-b" data-task-id="${task.id}" data-parent-task="${task.parentTask || ''}">
-                            <input type="checkbox" class="mr-2">
-                            <span class="flex-grow">${task.parentTask || task.subtask}</span>
-                            <div class="assignee-avatar bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-2">${assigneeInitials}</div>
-                            <span class="text-sm text-gray-500 mr-2">${task.dueDate}</span>
-                            <select class="status-select p-1 rounded border">
-                                <option value="Not Started" ${task.status === 'Not Started' ? 'selected' : ''}>Not Started</option>
-                                <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                                <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                            </select>
+                        <div class="section-header flex items-center p-2 bg-gray-100">
+                            <i class="fas fa-chevron-down mr-2"></i>
+                            <h2 class="text-lg font-bold">${section}</h2>
+                        </div>
+                        <div class="task-buttons mb-2">
+                            <button class="add-task-btn px-4 py-2 bg-blue-500 text-white rounded" data-section="${section}">+ Add Task</button>
+                            <button class="add-subtask-btn px-4 py-2 bg-green-500 text-white rounded" data-section="${section}">+ Add Subtask</button>
                         </div>
                     `;
+                    tasks.filter(task => task.section === section).forEach(task => {
+                        const assigneeInitials = task.assignee.split(' ').map(name => name[0]).join('').toUpperCase();
+                        taskList.innerHTML += `
+                            <div class="task-item flex items-center p-2 border-b" data-task-id="${task.id}" data-parent-task="${task.parentTask || ''}">
+                                <input type="checkbox" class="mr-2">
+                                <span class="flex-grow">${task.parentTask || task.subtask}</span>
+                                <div class="assignee-avatar bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-2">${assigneeInitials}</div>
+                                <span class="text-sm text-gray-500 mr-2">${task.dueDate}</span>
+                                <select class="status-select p-1 rounded border">
+                                    <option value="Not Started" ${task.status === 'Not Started' ? 'selected' : ''}>Not Started</option>
+                                    <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                    <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                </select>
+                            </div>
+                        `;
+                    });
                 });
-            });
 
-            // Add event listeners for status changes
-            document.querySelectorAll('.status-select').forEach(select => {
-                select.addEventListener('change', async (e) => {
-                    const taskItem = e.target.closest('.task-item');
-                    const taskId = taskItem.getAttribute('data-task-id');
-                    const status = e.target.value;
-                    await fetch(`${SCRIPT_URL}?action=updateTaskStatus&taskId=${taskId}&status=${status}`);
+                // Add event listeners for status changes
+                document.querySelectorAll('.status-select').forEach(select => {
+                    select.addEventListener('change', async (e) => {
+                        const taskItem = e.target.closest('.task-item');
+                        const taskId = taskItem.getAttribute('data-task-id');
+                        const status = e.target.value;
+                        await updateTaskStatus(taskId, status);
+                    });
                 });
-            });
 
-            // Add event listeners for task and subtask buttons
-            document.querySelectorAll('.add-task-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const section = e.target.getAttribute('data-section');
-                    document.getElementById('section').value = section;
-                    document.getElementById('addTaskModal').classList.remove('hidden');
+                // Add event listeners for task and subtask buttons
+                document.querySelectorAll('.add-task-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const section = e.target.getAttribute('data-section');
+                        document.getElementById('section').value = section;
+                        document.getElementById('addTaskModal').classList.remove('hidden');
+                    });
                 });
-            });
 
-            document.querySelectorAll('.add-subtask-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const section = e.target.getAttribute('data-section');
-                    const parentTasks = tasks.filter(task => task.section === section && !task.parentTask).map(task => `<option value="${task.id}">${task.parentTask || task.subtask}</option>`).join('');
-                    document.getElementById('parentTaskSelect').innerHTML = parentTasks;
-                    document.getElementById('addSubtaskModal').classList.remove('hidden');
+                document.querySelectorAll('.add-subtask-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const section = e.target.getAttribute('data-section');
+                        const parentTasks = tasks.filter(task => task.section === section && !task.parentTask).map(task => `<option value="${task.id}">${task.parentTask || task.subtask}</option>`).join('');
+                        document.getElementById('parentTaskSelect').innerHTML = parentTasks;
+                        document.getElementById('addSubtaskModal').classList.remove('hidden');
+                    });
                 });
-            });
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+            }
         }
 
-       document.getElementById('addTaskForm').addEventListener('submit', async (e) => {
+        async function updateTaskStatus(taskId, status) {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=updateTaskStatus&taskId=${taskId}&status=${status}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                fetchTasks(); // Refresh task list after updating status
+            } catch (error) {
+                console.error('Error updating task status:', error);
+            }
+        }
+
+        async function addTask(parentTask, section, assignee, startDate, dueDate, status) {
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action: 'addTask', parentTask, section, assignee, startDate, dueDate, status }),
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                document.getElementById('addTaskModal').classList.add('hidden');
+                fetchTasks(); // Refresh task list after adding task
+            } catch (error) {
+                console.error('Error adding task:', error);
+            }
+        }
+
+        async function addSubtask(parentTask, subtask, assignee, startDate, dueDate, status) {
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action: 'addSubtask', parentTask, subtask, assignee, startDate, dueDate, status }),
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                document.getElementById('addSubtaskModal').classList.add('hidden');
+                fetchTasks(); // Refresh task list after adding subtask
+            } catch (error) {
+                console.error('Error adding subtask:', error);
+            }
+        }
+
+        async function addSection(sectionName) {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=addSection`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sectionName }),
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                document.getElementById('addSectionModal').classList.add('hidden');
+                fetchTasks(); // Refresh task list after adding section
+            } catch (error) {
+                console.error('Error adding section:', error);
+            }
+        }
+
+        document.getElementById('addTaskForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const parentTask = document.getElementById('parentTask').value;
             const section = document.getElementById('section').value;
@@ -157,19 +237,9 @@
             const startDate = document.getElementById('startDate').value;
             const dueDate = document.getElementById('dueDate').value;
             const status = document.getElementById('status').value;
-        
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action: 'addTask', parentTask, section, assignee, startDate, dueDate, status }),
-            });
-        
-            document.getElementById('addTaskModal').classList.add('hidden');
-            fetchTasks();
+            await addTask(parentTask, section, assignee, startDate, dueDate, status);
         });
-        
+
         document.getElementById('addSubtaskForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const parentTask = document.getElementById('parentTaskSelect').value;
@@ -178,34 +248,17 @@
             const startDate = document.getElementById('subtaskStartDate').value;
             const dueDate = document.getElementById('subtaskDueDate').value;
             const status = document.getElementById('subtaskStatus').value;
-        
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ action: 'addSubtask', parentTask, subtask, assignee, startDate, dueDate, status }),
-            });
-        
-            document.getElementById('addSubtaskModal').classList.add('hidden');
-            fetchTasks();
-        });
-
-
-        document.getElementById('addSectionBtn').addEventListener('click', () => {
-            document.getElementById('addSectionModal').classList.remove('hidden');
+            await addSubtask(parentTask, subtask, assignee, startDate, dueDate, status);
         });
 
         document.getElementById('addSectionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const sectionName = document.getElementById('sectionName').value;
+            await addSection(sectionName);
+        });
 
-            await fetch(`${SCRIPT_URL}?action=addSection`, {
-                method: 'POST',
-                body: JSON.stringify({ sectionName }),
-            });
-            document.getElementById('addSectionModal').classList.add('hidden');
-            fetchTasks();
+        document.getElementById('addSectionBtn').addEventListener('click', () => {
+            document.getElementById('addSectionModal').classList.remove('hidden');
         });
 
         document.getElementById('cancelBtn').addEventListener('click', () => {
@@ -220,7 +273,7 @@
             document.getElementById('addSectionModal').classList.add('hidden');
         });
 
-        fetchTasks();
+        fetchTasks(); // Fetch tasks initially on page load
     </script>
 </body>
 </html>
