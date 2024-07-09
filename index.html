@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2024 Road Map</title>
-    <!-- Include Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Include Font Awesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
@@ -23,308 +21,204 @@
         </div>
         <div id="taskList" class="bg-white rounded shadow"></div>
     </div>
-    <!-- Modal for adding task -->
-    <div id="addTaskModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
-        <div class="bg-white p-4 rounded shadow-lg w-1/2">
-            <h2 class="text-xl font-bold mb-4">Add New Task</h2>
-            <form id="addTaskForm">
-                <input type="text" id="parentTask" placeholder="Parent Task" required class="w-full p-2 mb-2 border rounded">
-                <input type="text" id="section" placeholder="Section" required class="w-full p-2 mb-2 border rounded" readonly>
-                <input type="text" id="assignee" placeholder="Assignee" required class="w-full p-2 mb-2 border rounded">
-                <input type="date" id="startDate" required class="w-full p-2 mb-2 border rounded">
-                <input type="date" id="dueDate" required class="w-full p-2 mb-2 border rounded">
-                <select id="status" required class="w-full p-2 mb-2 border rounded">
-                    <option value="Not Started">Not Started</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                </select>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" id="cancelBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Task</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
-    <!-- Modal for adding subtask -->
-    <div id="addSubtaskModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
-        <div class="bg-white p-4 rounded shadow-lg w-1/2">
-            <h2 class="text-xl font-bold mb-4">Add New Subtask</h2>
-            <form id="addSubtaskForm">
-                <select id="parentTaskSelect" required class="w-full p-2 mb-2 border rounded"></select>
-                <input type="text" id="subtaskName" placeholder="Subtask Name" required class="w-full p-2 mb-2 border rounded">
-                <input type="text" id="subtaskSection" placeholder="Section" required class="w-full p-2 mb-2 border rounded" readonly>
-                <input type="text" id="subtaskAssignee" placeholder="Assignee" required class="w-full p-2 mb-2 border rounded">
-                <input type="date" id="subtaskStartDate" required class="w-full p-2 mb-2 border rounded">
-                <input type="date" id="subtaskDueDate" required class="w-full p-2 mb-2 border rounded">
-                <select id="subtaskStatus" required class="w-full p-2 mb-2 border rounded">
-                    <option value="Not Started">Not Started</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                </select>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" id="cancelSubtaskBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Subtask</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <!-- Modal for adding section -->
-    <div id="addSectionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
-        <div class="bg-white p-4 rounded shadow-lg w-1/2">
-            <h2 class="text-xl font-bold mb-4">Add New Section</h2>
-            <form id="addSectionForm">
-                <input type="text" id="sectionName" placeholder="Section Name" required class="w-full p-2 mb-2 border rounded">
-                <div class="flex justify-end space-x-2">
-                    <button type="button" id="cancelSectionBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Section</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <div id="modalContainer"></div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcIDy10G-TpRGTeB8TtlcZozuaxs1uScRcYcHyJM-Lf6eKeEDBAvexFfPdzQLZjh648Q/exec'; // Replace with your Web app URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzcIDy10G-TpRGTeB8TtlcZozuaxs1uScRcYcHyJM-Lf6eKeEDBAvexFfPdzQLZjh648Q/exec';
+        
+        const modalTemplates = {
+            task: `
+                <div id="addTaskModal" class="modal">
+                    <h2 class="text-xl font-bold mb-4">Add New Task</h2>
+                    <form id="addTaskForm">
+                        <input type="text" id="parentTask" placeholder="Parent Task" required>
+                        <input type="text" id="section" placeholder="Section" required readonly>
+                        <input type="text" id="assignee" placeholder="Assignee" required>
+                        <input type="date" id="startDate" required>
+                        <input type="date" id="dueDate" required>
+                        <select id="status" required>
+                            <option value="Not Started">Not Started</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" class="cancel-btn">Cancel</button>
+                            <button type="submit">Add Task</button>
+                        </div>
+                    </form>
+                </div>
+            `,
+            subtask: `
+                <div id="addSubtaskModal" class="modal">
+                    <h2 class="text-xl font-bold mb-4">Add New Subtask</h2>
+                    <form id="addSubtaskForm">
+                        <select id="parentTaskSelect" required></select>
+                        <input type="text" id="subtaskName" placeholder="Subtask Name" required>
+                        <input type="text" id="subtaskSection" placeholder="Section" required readonly>
+                        <input type="text" id="subtaskAssignee" placeholder="Assignee" required>
+                        <input type="date" id="subtaskStartDate" required>
+                        <input type="date" id="subtaskDueDate" required>
+                        <select id="subtaskStatus" required>
+                            <option value="Not Started">Not Started</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" class="cancel-btn">Cancel</button>
+                            <button type="submit">Add Subtask</button>
+                        </div>
+                    </form>
+                </div>
+            `,
+            section: `
+                <div id="addSectionModal" class="modal">
+                    <h2 class="text-xl font-bold mb-4">Add New Section</h2>
+                    <form id="addSectionForm">
+                        <input type="text" id="sectionName" placeholder="Section Name" required>
+                        <div class="flex justify-end space-x-2">
+                            <button type="button" class="cancel-btn">Cancel</button>
+                            <button type="submit">Add Section</button>
+                        </div>
+                    </form>
+                </div>
+            `
+        };
+
+        function showModal(type, data = {}) {
+            const modalContainer = document.getElementById('modalContainer');
+            modalContainer.innerHTML = modalTemplates[type];
+            modalContainer.querySelector('.modal').classList.remove('hidden');
+            
+            if (type === 'task' || type === 'subtask') {
+                modalContainer.querySelector('#section, #subtaskSection').value = data.section || '';
+            }
+            if (type === 'subtask') {
+                const parentTaskSelect = modalContainer.querySelector('#parentTaskSelect');
+                parentTaskSelect.innerHTML = data.parentTasks || '';
+            }
+        }
 
         async function fetchTasks() {
             try {
                 const response = await fetch(SCRIPT_URL);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                if (!response.ok) throw new Error('Network response was not ok');
                 const { tasks, sections } = await response.json();
-                const taskList = document.getElementById('taskList');
-                taskList.innerHTML = '';
-                sections.forEach(section => {
-                    taskList.innerHTML += `
-                        <div class="section-header flex items-center p-2 bg-gray-100">
-                            <i class="fas fa-chevron-down mr-2"></i>
-                            <h2 class="text-lg font-bold">${section}</h2>
-                        </div>
-                        <div class="task-buttons mb-2">
-                            <button class="add-task-btn px-4 py-2 bg-blue-500 text-white rounded" data-section="${section}">+ Add Task</button>
-                            <button class="add-subtask-btn px-4 py-2 bg-green-500 text-white rounded" data-section="${section}">+ Add Subtask</button>
-                        </div>
-                    `;
-                    tasks.filter(task => task.section === section).forEach(task => {
-                        const assigneeInitials = task.assignee.split(' ').map(name => name[0]).join('').toUpperCase();
-                        taskList.innerHTML += `
-                            <div class="task-item flex items-center p-2 border-b" data-task-id="${task.id}" data-parent-task="${task.parentTask || ''}">
-                                <input type="checkbox" class="mr-2">
-                                <span class="flex-grow">${task.parentTask || task.subtask}</span>
-                                <div class="assignee-avatar bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-2">${assigneeInitials}</div>
-                                <span class="text-sm text-gray-500 mr-2">${task.dueDate}</span>
-                                <select class="status-select p-1 rounded border">
-                                    <option value="Not Started" ${task.status === 'Not Started' ? 'selected' : ''}>Not Started</option>
-                                    <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                                    <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                                </select>
-                            </div>
-                        `;
-                    });
-                });
-
-                // Add event listeners for status changes
-                document.querySelectorAll('.status-select').forEach(select => {
-                    select.addEventListener('change', async (e) => {
-                        const taskItem = e.target.closest('.task-item');
-                        const taskId = taskItem.getAttribute('data-task-id');
-                        const status = e.target.value;
-                        await updateTaskStatus(taskId, status);
-                    });
-                });
-
-                // Add event listeners for task and subtask buttons
-                document.querySelectorAll('.add-task-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const section = e.target.getAttribute('data-section');
-                        document.getElementById('section').value = section;
-                        document.getElementById('addTaskModal').classList.remove('hidden');
-                    });
-                });
-
-                document.querySelectorAll('.add-subtask-btn').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const section = e.target.getAttribute('data-section');
-                        document.getElementById('subtaskSection').value = section;
-                        const parentTasks = tasks.filter(task => task.section === section && task.type === "Task").map(task => `<option value="${task.id}">${task.parentTask}</option>`).join('');
-                        document.getElementById('parentTaskSelect').innerHTML = parentTasks;
-                        document.getElementById('addSubtaskModal').classList.remove('hidden');
-                    });
-                });
+                renderTaskList(tasks, sections);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
             }
         }
-    </script>
-    <script>
+
+        function renderTaskList(tasks, sections) {
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = sections.map(section => `
+                <div class="section">
+                    <div class="section-header flex items-center p-2 bg-gray-100">
+                        <i class="fas fa-chevron-down mr-2"></i>
+                        <h2 class="text-lg font-bold">${section}</h2>
+                    </div>
+                    <div class="task-buttons mb-2">
+                        <button class="add-task-btn px-4 py-2 bg-blue-500 text-white rounded" data-section="${section}">+ Add Task</button>
+                        <button class="add-subtask-btn px-4 py-2 bg-green-500 text-white rounded" data-section="${section}">+ Add Subtask</button>
+                    </div>
+                    ${tasks.filter(task => task.section === section).map(task => `
+                        <div class="task-item flex items-center p-2 border-b" data-task-id="${task.id}" data-parent-task="${task.parentTask || ''}">
+                            <input type="checkbox" class="mr-2">
+                            <span class="flex-grow">${task.parentTask || task.subtask}</span>
+                            <div class="assignee-avatar bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-2">${task.assignee.split(' ').map(name => name[0]).join('').toUpperCase()}</div>
+                            <span class="text-sm text-gray-500 mr-2">${task.dueDate}</span>
+                            <select class="status-select p-1 rounded border">
+                                <option value="Not Started" ${task.status === 'Not Started' ? 'selected' : ''}>Not Started</option>
+                                <option value="In Progress" ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="Completed" ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
         async function updateTaskStatus(taskId, status) {
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'updateTaskStatus', taskId, status }),
                 });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                fetchTasks(); // Refresh task list after updating status
+                if (!response.ok) throw new Error('Network response was not ok');
+                fetchTasks();
             } catch (error) {
                 console.error('Error updating task status:', error);
             }
         }
 
-        async function addTask(parentTask, section, assignee, startDate, dueDate, status) {
+        async function addItem(action, data) {
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ action: 'addTask', parentTask, section, assignee, startDate, dueDate, status }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, ...data }),
                 });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                document.getElementById('addTaskModal').classList.add('hidden');
-                fetchTasks(); // Refresh task list after adding task
+                if (!response.ok) throw new Error('Network response was not ok');
+                document.querySelector('.modal').classList.add('hidden');
+                fetchTasks();
             } catch (error) {
-                console.error('Error adding task:', error);
+                console.error(`Error adding ${action}:`, error);
             }
         }
 
-        async function addSubtask(parentTask, subtask, section, assignee, startDate, dueDate, status) {
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ action: 'addSubtask', parentTask, subtask, section, assignee, startDate, dueDate, status }),
-                });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                document.getElementById('addSubtaskModal').classList.add('hidden');
-                fetchTasks(); // Refresh task list after adding subtask
-            } catch (error) {
-                console.error('Error adding subtask:', error);
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('add-task-btn')) {
+                showModal('task', { section: e.target.dataset.section });
+            } else if (e.target.classList.contains('add-subtask-btn')) {
+                const section = e.target.dataset.section;
+                const parentTasks = Array.from(document.querySelectorAll(`.task-item[data-parent-task=""][data-section="${section}"]`))
+                    .map(task => `<option value="${task.dataset.taskId}">${task.querySelector('span').textContent}</option>`)
+                    .join('');
+                showModal('subtask', { section, parentTasks });
+            } else if (e.target.id === 'addSectionBtn') {
+                showModal('section');
+            } else if (e.target.classList.contains('cancel-btn')) {
+                e.target.closest('.modal').classList.add('hidden');
             }
-        }
-
-        async function addSection(sectionName) {
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ action: 'addSection', sectionName }),
-                });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                document.getElementById('addSectionModal').classList.add('hidden');
-                fetchTasks(); // Refresh task list after adding section
-            } catch (error) {
-                console.error('Error adding section:', error);
-            }
-        }
-
-        // Function to safely add event listener
-        function safeAddEventListener(id, event, handler) {
-            const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener(event, handler);
-            } else {
-                console.error(`Element with id '${id}' not found`);
-            }
-        }
-    </script>
-    <script>
-        // Setup event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            safeAddEventListener('addTaskForm', 'submit', async (e) => {
-                e.preventDefault();
-                const parentTask = document.getElementById('parentTask')?.value;
-                const section = document.getElementById('section')?.value;
-                const assignee = document.getElementById('assignee')?.value;
-                const startDate = document.getElementById('startDate')?.value;
-                const dueDate = document.getElementById('dueDate')?.value;
-                const status = document.getElementById('status')?.value;
-                if (parentTask && section && assignee && startDate && dueDate && status) {
-                    await addTask(parentTask, section, assignee, startDate, dueDate, status);
-                } else {
-                    console.error('Some form fields are missing');
-                }
-            });
-
-            safeAddEventListener('addSubtaskForm', 'submit', async (e) => {
-                e.preventDefault();
-                const parentTask = document.getElementById('parentTaskSelect')?.value;
-                const subtask = document.getElementById('subtaskName')?.value;
-                const section = document.getElementById('subtaskSection')?.value;
-                const assignee = document.getElementById('subtaskAssignee')?.value;
-                const startDate = document.getElementById('subtaskStartDate')?.value;
-                const dueDate = document.getElementById('subtaskDueDate')?.value;
-                const status = document.getElementById('subtaskStatus')?.value;
-                if (parentTask && subtask && section && assignee && startDate && dueDate && status) {
-                    await addSubtask(parentTask, subtask, section, assignee, startDate, dueDate, status);
-                } else {
-                    console.error('Some form fields are missing');
-                }
-            });
-
-            safeAddEventListener('addSectionForm', 'submit', async (e) => {
-                e.preventDefault();
-                const sectionName = document.getElementById('sectionName')?.value;
-                if (sectionName) {
-                    await addSection(sectionName);
-                } else {
-                    console.error('Section name is missing');
-                }
-            });
-
-            safeAddEventListener('addSectionBtn', 'click', () => {
-                const modal = document.getElementById('addSectionModal');
-                if (modal) {
-                    modal.classList.remove('hidden');
-                } else {
-                    console.error('Add section modal not found');
-                }
-            });
-
-            safeAddEventListener('cancelBtn', 'click', () => {
-                const modal = document.getElementById('addTaskModal');
-                if (modal) {
-                    modal.classList.add('hidden');
-                } else {
-                    console.error('Add task modal not found');
-                }
-            });
-
-            safeAddEventListener('cancelSubtaskBtn', 'click', () => {
-                const modal = document.getElementById('addSubtaskModal');
-                if (modal) {
-                    modal.classList.add('hidden');
-                } else {
-                    console.error('Add subtask modal not found');
-                }
-            });
-
-            safeAddEventListener('cancelSectionBtn', 'click', () => {
-                const modal = document.getElementById('addSectionModal');
-                if (modal) {
-                    modal.classList.add('hidden');
-                } else {
-                    console.error('Add section modal not found');
-                }
-            });
-
-            fetchTasks(); // Fetch tasks initially on page load
         });
+
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('status-select')) {
+                const taskItem = e.target.closest('.task-item');
+                updateTaskStatus(taskItem.dataset.taskId, e.target.value);
+            }
+        });
+
+        document.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const form = e.target;
+            if (form.id === 'addTaskForm') {
+                addItem('addTask', {
+                    parentTask: form.parentTask.value,
+                    section: form.section.value,
+                    assignee: form.assignee.value,
+                    startDate: form.startDate.value,
+                    dueDate: form.dueDate.value,
+                    status: form.status.value
+                });
+            } else if (form.id === 'addSubtaskForm') {
+                addItem('addSubtask', {
+                    parentTask: form.parentTaskSelect.value,
+                    subtask: form.subtaskName.value,
+                    section: form.subtaskSection.value,
+                    assignee: form.subtaskAssignee.value,
+                    startDate: form.subtaskStartDate.value,
+                    dueDate: form.subtaskDueDate.value,
+                    status: form.subtaskStatus.value
+                });
+            } else if (form.id === 'addSectionForm') {
+                addItem('addSection', { sectionName: form.sectionName.value });
+            }
+        });
+
+        fetchTasks();
     </script>
 </body>
 </html>
