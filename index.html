@@ -3,30 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Management Dashboard</title>
+    <title>2024 Road Map</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
     <div class="container mx-auto p-4">
         <h1 class="text-2xl font-bold mb-4">2024 Road Map</h1>
-        <div id="taskList" class="mb-8"></div>
-        <form id="addTaskForm" class="bg-white p-4 rounded shadow">
-            <h2 class="text-xl font-bold mb-4">Add New Task</h2>
-            <input type="text" id="taskName" placeholder="Task Name" required class="w-full p-2 mb-2 border rounded">
-            <input type="text" id="section" placeholder="Section" required class="w-full p-2 mb-2 border rounded">
-            <input type="text" id="assignee" placeholder="Assignee" required class="w-full p-2 mb-2 border rounded">
-            <input type="date" id="startDate" required class="w-full p-2 mb-2 border rounded">
-            <input type="date" id="dueDate" required class="w-full p-2 mb-2 border rounded">
-            <select id="status" required class="w-full p-2 mb-2 border rounded">
-                <option value="Not Started">Not Started</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Completed">Completed</option>
-            </select>
-            <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">Add Task</button>
-        </form>
+        <div class="mb-4 flex space-x-2">
+            <button class="px-4 py-2 bg-blue-500 text-white rounded">Overview</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">List</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Board</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Timeline</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Dashboard</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Calendar</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Workflow</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Messages</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Files</button>
+            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Gantt</button>
+        </div>
+        <div class="mb-4 flex justify-between items-center">
+            <button id="addTaskBtn" class="px-4 py-2 bg-blue-500 text-white rounded">+ Add task</button>
+            <div class="flex space-x-2">
+                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Filter: 1</button>
+                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Sort</button>
+                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Group by</button>
+                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Hide</button>
+            </div>
+        </div>
+        <div id="taskList" class="bg-white rounded shadow"></div>
     </div>
+
+    <!-- Modal for adding task -->
+    <div id="addTaskModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center">
+        <div class="bg-white p-4 rounded shadow-lg w-1/2">
+            <h2 class="text-xl font-bold mb-4">Add New Task</h2>
+            <form id="addTaskForm">
+                <input type="text" id="taskName" placeholder="Task Name" required class="w-full p-2 mb-2 border rounded">
+                <input type="text" id="section" placeholder="Section" required class="w-full p-2 mb-2 border rounded">
+                <input type="text" id="assignee" placeholder="Assignee" required class="w-full p-2 mb-2 border rounded">
+                <input type="date" id="startDate" required class="w-full p-2 mb-2 border rounded">
+                <input type="date" id="dueDate" required class="w-full p-2 mb-2 border rounded">
+                <select id="status" required class="w-full p-2 mb-2 border rounded">
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAZg0TIQHftOmHd-MqYeF65EZwLVOvKgNJ7VSpqtDVCbcXFjHFGESALcRLOz2c3JsNkg/exec'; // Replace with your Web app URL
+        const SCRIPT_URL = 'https://script.google.com/a/macros/safesync.ai/s/AKfycbxxX4_Ez-WquNe8z-PlsyLXRbY_x8cU-Ed7lZzqjqS-sH7JemnmBxleOZACUeNH8T-h1g/exec'; // Replace with your Web app URL
 
         async function fetchTasks() {
             const response = await fetch(SCRIPT_URL);
@@ -37,19 +69,34 @@
             tasks.forEach(task => {
                 if (task.section !== currentSection) {
                     currentSection = task.section;
-                    taskList.innerHTML += `<h2 class="text-xl font-bold mt-4 mb-2">${currentSection}</h2>`;
-                }
-                taskList.innerHTML += `
-                    <div class="bg-white p-2 mb-2 rounded shadow flex justify-between items-center">
-                        <div>
-                            <span class="font-bold">${task.taskName}</span>
-                            <span class="text-sm text-gray-500 ml-2">${task.assignee}</span>
+                    taskList.innerHTML += `
+                        <div class="section-header flex items-center p-2 bg-gray-100">
+                            <i class="fas fa-chevron-down mr-2"></i>
+                            <h2 class="text-lg font-bold">${currentSection}</h2>
                         </div>
-                        <span class="text-sm ${task.status === 'Completed' ? 'text-green-500' : 'text-red-500'}">${task.dueDate}</span>
+                    `;
+                }
+                const assigneeInitials = task.assignee.split(' ').map(name => name[0]).join('').toUpperCase();
+                taskList.innerHTML += `
+                    <div class="task-item flex items-center p-2 border-b">
+                        <input type="checkbox" class="mr-2">
+                        <span class="flex-grow">${task.taskName}</span>
+                        <div class="assignee-avatar bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-2">${assigneeInitials}</div>
+                        <span class="text-sm text-gray-500">${task.dueDate}</span>
                     </div>
                 `;
             });
         }
+
+        document.getElementById('addTaskBtn').addEventListener('click', () => {
+            document.getElementById('addTaskModal').classList.remove('hidden');
+            document.getElementById('addTaskModal').classList.add('flex');
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            document.getElementById('addTaskModal').classList.add('hidden');
+            document.getElementById('addTaskModal').classList.remove('flex');
+        });
 
         document.getElementById('addTaskForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -67,6 +114,8 @@
             });
             fetchTasks();
             e.target.reset();
+            document.getElementById('addTaskModal').classList.add('hidden');
+            document.getElementById('addTaskModal').classList.remove('flex');
         });
 
         fetchTasks();
